@@ -9,6 +9,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Remember API
+// @version 1.0
+// @description API for the Remember app.
+// @host localhost:8000
+// @BasePath /
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, using system environment variables")

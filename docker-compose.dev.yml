@@ -1,0 +1,17 @@
+services:
+  remember-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /go/src/app
+          ignore:
+            - .git/
+            - tmp/
+        - action: rebuild
+          path: go.mod
+        - action: rebuild
+          path: go.sum

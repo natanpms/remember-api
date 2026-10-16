@@ -1,0 +1,24 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: API for the Remember app.
+  title: Remember API
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      description: do ping
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: ping example
+      tags:
+        - ping
+swagger: "2.0"
