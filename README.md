@@ -61,28 +61,3 @@ Sempre que adicionar ou alterar anotações Swag nos handlers, regenere os arqui
 swag init -g cmd/main.go
 ```
 
-## Endpoints
-
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/api/v1/ping` | Health check — retorna `{"message": "pong"}` |
-| `GET` | `/api/v1/swagger/*any` | Documentação Swagger UI |
-
-## Estrutura do projeto
-
-```
-.
-├── cmd/
-│   └── main.go            # Entrypoint da aplicação
-├── db/
-│   └── db.go              # Conexão com o PostgreSQL
-├── docs/                  # Documentação gerada pelo Swag (não editar)
-├── model/                 # Modelos de dados
-├── routes/
-│   └── route.go           # Definição das rotas e handlers
-├── docker-compose.yml     # Compose de produção
-├── docker-compose.dev.yml # Override de dev (watch + hot reload)
-├── Dockerfile             # Build de produção
-├── Dockerfile.dev         # Build de desenvolvimento (Air)
-└── .air.toml              # Configuração do Air
-```
