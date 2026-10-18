@@ -1,4 +1,45 @@
 basePath: /
+definitions:
+  handlers.APIError:
+    properties:
+      code:
+        $ref: '#/definitions/handlers.ErrorCode'
+    type: object
+  handlers.APIResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/handlers.APIError'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.ErrorCode:
+    enum:
+    - NOT_FOUND
+    - INVALID_REQUEST
+    - UNAUTHORIZED
+    - FORBIDDEN
+    - INTERNAL_ERROR
+    type: string
+    x-enum-varnames:
+    - ErrCodeNotFound
+    - ErrCodeInvalidRequest
+    - ErrCodeUnauthorized
+    - ErrCodeForbidden
+    - ErrCodeInternal
+  model.Product:
+    properties:
+      created_at:
+        type: string
+      id_product:
+        type: integer
+      price:
+        type: number
+      product_name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -6,19 +47,103 @@ info:
   title: Remember API
   version: "1.0"
 paths:
-  /ping:
+  /api/v1/products:
     get:
-      description: do ping
+      description: Get a list of all products
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: ping example
+            $ref: '#/definitions/handlers.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      summary: Get all products
       tags:
-        - ping
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product with the given payload
+      parameters:
+      - description: Product payload
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      summary: Create a product
+      tags:
+      - products
+  /api/v1/products/{id}:
+    delete:
+      description: Delete a product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      description: Get a single product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      summary: Get a product by ID
+      tags:
+      - products
 swagger: "2.0"

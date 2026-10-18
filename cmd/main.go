@@ -12,7 +12,7 @@ import (
 // @title Remember API
 // @version 1.0
 // @description API for the Remember app.
-// @host localhost:8000
+// @host localhost:8080
 // @BasePath /
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -25,6 +25,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	router := routes.ExecuteRoutes()
+	router := routes.ExecuteRoutes(conn)
 	router.Run() // listens on 0.0.0.0:8080 by default
 }

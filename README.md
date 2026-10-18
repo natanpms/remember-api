@@ -1,6 +1,6 @@
 # Remember API
 
-API REST desenvolvida para gerenciar contéudo de uma aplicação web de rede neurais com foco em criar, gerenciar e cultivar memórias e ideias.
+API REST desenvolvida para praticar alguns conceitos de go e gin
 
 ## Tecnologias
 
