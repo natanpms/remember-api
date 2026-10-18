@@ -29,16 +29,59 @@ definitions:
     - ErrCodeUnauthorized
     - ErrCodeForbidden
     - ErrCodeInternal
-  model.Product:
+  model.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.Memory:
     properties:
       created_at:
         type: string
-      id_product:
-        type: integer
-      price:
-        type: number
-      product_name:
+      description:
         type: string
+      group_id:
+        type: integer
+      id:
+        type: integer
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  model.MemoryGroup:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - name
+    type: object
+  model.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
     type: object
 host: localhost:8080
 info:
@@ -47,9 +90,18 @@ info:
   title: Remember API
   version: "1.0"
 paths:
-  /api/v1/products:
-    get:
-      description: Get a list of all products
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
       produces:
       - application/json
       responses:
@@ -57,24 +109,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.APIResponse'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/handlers.APIResponse'
-      summary: Get all products
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      summary: Login
       tags:
-      - products
+      - auth
+  /api/v1/auth/register:
     post:
       consumes:
       - application/json
-      description: Create a new product with the given payload
+      description: Create a new user account
       parameters:
-      - description: Product payload
+      - description: User payload
         in: body
-        name: product
+        name: user
         required: true
         schema:
-          $ref: '#/definitions/model.Product'
+          $ref: '#/definitions/model.RegisterRequest'
       produces:
       - application/json
       responses:
@@ -86,44 +143,72 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.APIResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.APIResponse'
-      summary: Create a product
+      summary: Register a new user
       tags:
-      - products
-  /api/v1/products/{id}:
-    delete:
-      description: Delete a product by its ID
-      parameters:
-      - description: Product ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handlers.APIResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handlers.APIResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.APIResponse'
-      summary: Delete a product
-      tags:
-      - products
+      - auth
+  /api/v1/groups:
     get:
-      description: Get a single product by its ID
+      description: Get a list of all memory groups of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all memory groups
+      tags:
+      - groups
+    post:
+      consumes:
+      - application/json
+      description: Create a new memory group for the authenticated user
       parameters:
-      - description: Product ID
+      - description: Group payload
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/model.MemoryGroup'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a memory group
+      tags:
+      - groups
+  /api/v1/groups/{id}:
+    delete:
+      description: Delete a memory group by its ID (memories inside it are also deleted)
+      parameters:
+      - description: Group ID
         in: path
         name: id
         required: true
@@ -135,6 +220,119 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a memory group
+      tags:
+      - groups
+    get:
+      description: Get a single memory group by its ID
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a memory group by ID
+      tags:
+      - groups
+  /api/v1/groups/{id}/memories:
+    get:
+      description: Get a list of all memories of a group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all memories of a group
+      tags:
+      - memories
+    post:
+      consumes:
+      - application/json
+      description: Create a new memory or idea inside a group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Memory payload
+        in: body
+        name: memory
+        required: true
+        schema:
+          $ref: '#/definitions/model.Memory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
         "404":
           description: Not Found
           schema:
@@ -143,7 +341,80 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.APIResponse'
-      summary: Get a product by ID
+      security:
+      - BearerAuth: []
+      summary: Create a memory
       tags:
-      - products
+      - memories
+  /api/v1/memories/{id}:
+    delete:
+      description: Delete a memory by its ID
+      parameters:
+      - description: Memory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a memory
+      tags:
+      - memories
+    get:
+      description: Get a single memory by its ID
+      parameters:
+      - description: Memory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a memory by ID
+      tags:
+      - memories
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and the JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

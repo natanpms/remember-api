@@ -1,6 +1,14 @@
 # Remember API
 
-API REST desenvolvida para praticar alguns conceitos de go e gin
+API REST desenvolvida para gerenciar contéudo de uma aplicação web de rede neurais com foco em criar, gerenciar e cultivar memórias e ideias.
+
+## Banco de dados
+
+O script `db/migrations/init.sql` contem os scripts sql. Caso queira subir:
+
+```powershell
+Get-Content db\migrations\init.sql | docker exec -i nome-db psql -U postgres -d nome-db
+```
 
 ## Tecnologias
 
