@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"gin-quickstart/db"
-	"gin-quickstart/routes"
+	"github.com/natanpms/remember-api/db"
+	"github.com/natanpms/remember-api/routes"
 
 	"github.com/joho/godotenv"
 )

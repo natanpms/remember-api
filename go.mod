@@ -1,4 +1,4 @@
-module gin-quickstart
+module github.com/natanpms/remember-api
 
 go 1.27.1
 
